@@ -4,6 +4,14 @@ import { dirname, join } from 'path';
 import { config } from './config/index.js';
 import routes from './routes/index.js';
 
+// 1. ES Modules don't have __dirname by default — recreate it FIRST
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+// 2. INITIALIZE THE APP BEFORE USING IT
+const app = express();
+const { port: PORT, nodeEnv } = config;
+
 // ============================================
 // MIDDLEWARE
 // ============================================
@@ -16,7 +24,6 @@ app.use(express.static(join(__dirname, '../public')));
 // ============================================
 app.set('view engine', 'ejs');
 app.set('views', join(__dirname, 'views'));
-
 
 // ============================================
 // VIEW HELPERS (available in every template)
@@ -47,7 +54,6 @@ app.locals.typeColors = {
 // ============================================
 app.use('/', routes);
 
-
 // ============================================
 // ERROR HANDLERS
 // ============================================
@@ -64,13 +70,6 @@ app.use((err, _req, res, _next) => {
     error: err.message
   });
 });
-
-// ES Modules don't have __dirname by default — recreate it.
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const app = express();
-const { port: PORT, nodeEnv } = config;
 
 // ============================================
 // START SERVER
